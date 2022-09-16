@@ -39,6 +39,7 @@ locals {
 
 #---------------------------------------------------------------
 # EKS Blueprints
+#  capacity_type   = "SPOT" #  is for internal test env to save money.
 #---------------------------------------------------------------
 
 module "eks_blueprints" {
@@ -56,6 +57,7 @@ module "eks_blueprints" {
       instance_types  = ["m5.large"]
       min_size        = 2
       subnet_ids      = module.vpc.private_subnets
+      #capacity_type   = "SPOT"
     }
   }
 
