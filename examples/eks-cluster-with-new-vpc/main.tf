@@ -23,23 +23,24 @@ data "aws_eks_cluster_auth" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name = basename(path.cwd)
+  name = "stc-eks-prod-1"
   # var.cluster_name is for Terratest
   cluster_name = coalesce(var.cluster_name, local.name)
-  region       = "us-west-2"
+  region       = "us-east-1"
 
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr = "172.17.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
     Blueprint  = local.name
     GithubRepo = "github.com/aws-ia/terraform-aws-eks-blueprints"
+    environment = "prod"
+    project = "atlas"
   }
 }
 
 #---------------------------------------------------------------
 # EKS Blueprints
-#  capacity_type   = "SPOT" #  is for internal test env to save money.
 #---------------------------------------------------------------
 
 module "eks_blueprints" {
@@ -47,19 +48,37 @@ module "eks_blueprints" {
 
   cluster_name    = local.cluster_name
   cluster_version = "1.23"
+  
 
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
-  managed_node_groups = {
-    mg_5 = {
-      node_group_name = "managed-ondemand"
-      instance_types  = ["m5.large"]
+  self_managed_node_groups = {
+    self_mg_4 = {
+      node_group_name = "self-managed-ondemand"
+      instance_types  = ["t3a.xlarge"]
+      launch_template_os   = "amazonlinux2eks"       # amazonlinux2eks
       min_size        = 2
+      max_size        = 4
       subnet_ids      = module.vpc.private_subnets
-      #capacity_type   = "SPOT"
+      #enable_monitoring = false
+      #public_ip         = false 
+
     }
   }
+
+  map_users = [
+    {
+      userarn  = "arn:aws:iam::640517671398:user/cnatesan"
+      username = "cnatesan"
+      groups   = ["system:masters"]
+    },
+    {
+      userarn  = "arn:aws:iam::640517671398:user/eks_service_account"
+      username = "eks_service_account"
+      groups   = ["system:masters"]
+    },
+  ]
 
   tags = local.tags
 }
@@ -73,28 +92,19 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_version  = module.eks_blueprints.eks_cluster_version
 
   # EKS Managed Add-ons
-  enable_amazon_eks_vpc_cni            = true
-  enable_amazon_eks_coredns            = true
-  enable_amazon_eks_kube_proxy         = true
-  enable_amazon_eks_aws_ebs_csi_driver = true
+  enable_amazon_eks_vpc_cni            = false
+  enable_amazon_eks_coredns            = false
+  enable_amazon_eks_kube_proxy         = false
+  enable_amazon_eks_aws_ebs_csi_driver = false
 
   # Add-ons
   enable_aws_load_balancer_controller = true
   enable_metrics_server               = true
+  enable_cluster_autoscaler           = true
   enable_aws_cloudwatch_metrics       = true
   enable_kubecost                     = true
-  enable_gatekeeper                   = true
-
-  enable_cluster_autoscaler = true
-  cluster_autoscaler_helm_config = {
-    set = [
-      {
-        name  = "podLabels.prometheus\\.io/scrape",
-        value = "true",
-        type  = "string",
-      }
-    ]
-  }
+  enable_traefik                      = true
+  enable_kubernetes_dashboard         = true
 
   enable_cert_manager = true
   cert_manager_helm_config = {
@@ -105,7 +115,6 @@ module "eks_blueprints_kubernetes_addons" {
       },
     ]
   }
-  enable_cert_manager_csi_driver = true
 
   tags = local.tags
 }

@@ -43,7 +43,6 @@ resource "helm_release" "addon" {
     content {
       name  = each_item.value.name
       value = each_item.value.value
-      type  = try(each_item.value.type, null)
     }
   }
 
@@ -54,7 +53,6 @@ resource "helm_release" "addon" {
     content {
       name  = each_item.value.name
       value = each_item.value.value
-      type  = try(each_item.value.type, null)
     }
   }
   depends_on = [module.irsa]
