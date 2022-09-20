@@ -23,7 +23,7 @@ data "aws_eks_cluster_auth" "this" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name = "stc-eks-prod-1"
+  name = "stc-eks-atlas-prod-1"
   # var.cluster_name is for Terratest
   cluster_name = coalesce(var.cluster_name, local.name)
   region       = "us-east-1"
@@ -47,18 +47,19 @@ module "eks_blueprints" {
   source = "../.."
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.23"
+  cluster_version = "1.22"
   
 
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
   self_managed_node_groups = {
-    self_mg_4 = {
-      node_group_name = "self-managed-ondemand"
-      instance_types  = ["t3a.xlarge"]
+    self_t3 = {
+      node_group_name = "self-managed-ondemand-t3"
+      instance_types  = ["t3.xlarge"]
       launch_template_os   = "amazonlinux2eks"       # amazonlinux2eks
-      min_size        = 2
+      min_size        = 1
+      desired_capacity    = 3
       max_size        = 4
       subnet_ids      = module.vpc.private_subnets
       #enable_monitoring = false
@@ -66,6 +67,15 @@ module "eks_blueprints" {
 
     }
   }
+
+  #managed_node_groups = {
+  #  mg_5 = {
+  #    node_group_name = "managed-ondemand"
+  #    instance_types  = ["m5.xlarge"]
+  #    min_size        = 2
+  #    subnet_ids      = module.vpc.private_subnets
+  #  }
+  #}
 
   map_users = [
     {
@@ -101,12 +111,12 @@ module "eks_blueprints_kubernetes_addons" {
   enable_aws_load_balancer_controller = true
   enable_metrics_server               = true
   enable_cluster_autoscaler           = true
-  enable_aws_cloudwatch_metrics       = true
+  enable_aws_cloudwatch_metrics       = false
   enable_kubecost                     = true
-  enable_traefik                      = true
-  enable_kubernetes_dashboard         = true
+  enable_traefik                      = false
+  enable_kubernetes_dashboard         = false
 
-  enable_cert_manager = true
+  enable_cert_manager = false
   cert_manager_helm_config = {
     set_values = [
       {

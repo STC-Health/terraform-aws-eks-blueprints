@@ -5,7 +5,7 @@ locals {
     name        = local.name
     chart       = local.name
     repository  = "https://helm.traefik.io/traefik"
-    version     = "10.20.1"
+    version     = "10.24.3"
     namespace   = local.name
     description = "The Traefik Helm Chart is focused on Traefik deployment configuration"
     values      = local.default_helm_values

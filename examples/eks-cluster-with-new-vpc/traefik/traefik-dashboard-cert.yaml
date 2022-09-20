@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: traefik-dashboard-cert
+  namespace: traefik
+spec:
+  #htpasswd -nb <u.n> <password> | openssl base64
+  secretName: traefik-dashboard-cert  # Need to install Cert-manager CRD and Traefix will use the lets encrypt issued Cert for the domain nam
+  dnsNames:
+    - traefik-dashboard-atlas.stchealth.app # Domain is hosted in Cloudfare
+  issuerRef:
+    name: traefik-letsencrypt-1
+    kind: ClusterIssuer
+
