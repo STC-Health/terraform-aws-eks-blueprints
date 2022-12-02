@@ -101,7 +101,7 @@ module "eks_blueprints" {
       instance_type  = "t3.xlarge"
       launch_template_os   = "amazonlinux2eks"       # amazonlinux2eks
       min_size        = 2
-      desired_capacity    = 2
+      desired_capacity    = 3
       max_size        = 6
       subnet_ids      = module.vpc.private_subnets
       update_config = [{
@@ -141,16 +141,17 @@ module "eks_blueprints_kubernetes_addons" {
   enable_amazon_eks_vpc_cni            = false
   enable_amazon_eks_coredns            = false
   enable_amazon_eks_kube_proxy         = false
-  enable_amazon_eks_aws_ebs_csi_driver = false
+  enable_amazon_eks_aws_ebs_csi_driver = true
 
   # Add-ons
   enable_aws_load_balancer_controller = true
   enable_metrics_server               = true
   enable_aws_cloudwatch_metrics       = true
   enable_kubecost                     = true
-  enable_gatekeeper                   = true
+  #enable_gatekeeper                   = true
 
   enable_cluster_autoscaler = true
+  enable_kubernetes_dashboard         = true
   enable_cert_manager = false
   # TODO - requires dependency on `cert-manager` for namespace
   # enable_cert_manager_csi_driver = true
