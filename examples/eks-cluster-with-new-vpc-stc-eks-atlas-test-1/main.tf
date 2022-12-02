@@ -29,12 +29,13 @@ data "aws_availability_zones" "available" {
 
 locals {
   #name = basename(path.cwd)
-  name = "stc-eks-atlas-test-1"
+  name = var.cluster_name
   # var.cluster_name is for Terratest
   cluster_name = coalesce(var.cluster_name, local.name)
   region       = "us-east-2"
 
-  vpc_cidr = "172.17.0.0/16"
+  #vpc_cidr = "172.17.0.0/16"
+  vpc_cidr = "${var.env_data["vpc_cidr"]}"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
@@ -57,6 +58,7 @@ module "eks_blueprints" {
 
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
+  cluster_enabled_log_types = ["api", "audit", "authenticator"]
 
   node_security_group_additional_rules = {
     # Extend node-to-node security group rules. Recommended and required for the Add-ons
@@ -92,17 +94,22 @@ module "eks_blueprints" {
     }
   }
 
-  managed_node_groups = {
-    mg_5 = {
-      node_group_name = "managed-ondemand"
-      instance_types  = ["m5.large"]
-      min_size        = 1
+  # R5 for memory intensive apps. C5 for CPU intensive apps. M5 for PROD in general. t3 for Test or internal env.
+  self_managed_node_groups = {
+    self_t3 = {
+      node_group_name = "self-managed-ondemand-t3"
+      instance_type  = "t3.xlarge"
+      launch_template_os   = "amazonlinux2eks"       # amazonlinux2eks
+      min_size        = 2
+      desired_capacity    = 2
       max_size        = 6
-      desired_size    = 2
       subnet_ids      = module.vpc.private_subnets
       update_config = [{
         max_unavailable_percentage = 30
       }]
+      #enable_monitoring = false
+      #public_ip         = false 
+
     }
   }
 
@@ -144,25 +151,7 @@ module "eks_blueprints_kubernetes_addons" {
   enable_gatekeeper                   = true
 
   enable_cluster_autoscaler = true
-  cluster_autoscaler_helm_config = {
-    set = [
-      {
-        name  = "podLabels.prometheus\\.io/scrape",
-        value = "true",
-        type  = "string",
-      }
-    ]
-  }
-
   enable_cert_manager = false
-  cert_manager_helm_config = {
-    set_values = [
-      {
-        name  = "extraArgs[0]"
-        value = "--enable-certificate-owner-ref=false"
-      },
-    ]
-  }
   # TODO - requires dependency on `cert-manager` for namespace
   # enable_cert_manager_csi_driver = true
 
