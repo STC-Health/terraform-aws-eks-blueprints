@@ -146,7 +146,7 @@ module "eks_blueprints_kubernetes_addons" {
   # Add-ons
   enable_aws_load_balancer_controller = true
   enable_metrics_server               = true
-  enable_aws_cloudwatch_metrics       = true
+  enable_aws_cloudwatch_metrics       = false
   enable_kubecost                     = true
   #enable_gatekeeper                   = true
 
