@@ -1,0 +1,19 @@
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: linkerd-dashboard-redirect
+  namespace: linkerd-viz
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`linkerd-dashboard-atlas-test-1.hostk8s4.com`)
+    kind: Rule
+    services:
+    - name: web
+      port: 8084
+    middlewares:
+    - name: https-redirect
+      namespace: linkerd-viz
+
+

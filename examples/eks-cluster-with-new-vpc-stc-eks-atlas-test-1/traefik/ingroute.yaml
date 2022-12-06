@@ -1,0 +1,27 @@
+# ingress-route.yaml
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dashboard
+  namespace: traefik
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`traefik-dashboard-atlas-test-1.hostk8s4.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      kind: Rule
+      services:
+      - name: api@internal
+        kind: TraefikService
+      middlewares:
+        - name: basic-auth
+          namespace: traefik
+        - name: traefik-dashboard-redirect
+          namespace: traefik
+        - name: https-redirect
+          namespace: traefik
+  tls:
+    secretName: traefik-dashboard-cert  # same content as in traefik-cert
+    domains:
+      - main: traefik-dashboard-atlas-test-1.hostk8s4.com

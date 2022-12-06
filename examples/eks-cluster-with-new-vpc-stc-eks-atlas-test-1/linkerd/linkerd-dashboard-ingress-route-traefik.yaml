@@ -1,0 +1,34 @@
+kind: Middleware
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: linkerd-dashboard-auth
+  namespace: linkerd-viz
+spec:
+  basicAuth:
+    secret: linkerd-dashboard-auth-secret
+---
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: linkerd-dashboard
+  namespace: linkerd-viz
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`linkerd-dashboard-atlas-test-1.hostk8s4.com`)
+    kind: Rule
+    services:
+    - name: web
+      port: 8084
+    middlewares:
+    - name: linkerd-dashboard-auth
+      namespace: linkerd-viz
+    - name: https-redirect
+      namespace: linkerd-viz
+  tls:
+    secretName: linkerd-cert # same content as in traefik-cert
+    domains:
+      - main: linkerd-dashboard-atlas-test-1.hostk8s4.com
+
+
