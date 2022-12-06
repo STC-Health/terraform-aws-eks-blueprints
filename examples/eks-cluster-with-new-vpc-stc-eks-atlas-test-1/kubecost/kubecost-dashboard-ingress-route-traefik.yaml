@@ -1,0 +1,21 @@
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: kubecost-dashboard
+  namespace: kubecost
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`kubecost-dashboard-atlas-test-1.hostk8s4.com`)
+    kind: Rule
+    services:
+    - name: kubecost-cost-analyzer
+      port: 9090
+    middlewares:
+    - name: https-redirect
+      namespace: kubecost
+  tls:
+    secretName: kubecost-cert # same content as in traefik-cert
+    domains:
+      - main: kubecost-dashboard-atlas-test-1.hostk8s4.com
