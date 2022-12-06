@@ -151,13 +151,14 @@ module "eks_blueprints_kubernetes_addons" {
   #enable_gatekeeper                   = true
 
   enable_cluster_autoscaler = true
-  enable_kubernetes_dashboard         = true
+  enable_kubernetes_dashboard = false
   enable_cert_manager = true
   cert_manager_letsencrypt_email = "chakki_natesan@stchome.com"
   # TODO - requires dependency on `cert-manager` for namespace
   # enable_cert_manager_csi_driver = true
 
   enable_traefik = false
+  enable_argocd = true
 
   tags = local.tags
 }

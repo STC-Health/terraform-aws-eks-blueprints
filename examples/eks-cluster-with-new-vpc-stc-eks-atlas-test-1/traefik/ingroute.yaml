@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`traefik-dashboard-atlas-test-1.hostk8s4.com`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+    - match: Host(`traefik-dashboard-atlas-test-1.hostk8s4.com`) && (PathPrefix(`/api`) || Host(`traefik-dashboard-atlas-test-1.hostk8s4.com`) && PathPrefix(`/dashboard`))
       kind: Rule
       services:
       - name: api@internal

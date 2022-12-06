@@ -1,0 +1,31 @@
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: argocd-dashboard
+  namespace: argocd
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - kind: Rule
+    match: Host(`argocd-dashboard-atlas-test-1.hostk8s4.com`)
+    priority: 10
+    services:
+    - name: argo-cd-argocd-server
+      port: 80
+  - kind: Rule
+    match: Host(`argocd-dashboard-atlas-test-1.hostk8s4.com`) && Headers(`Content-Type`, `application/grpc`)
+    priority: 11
+    services:
+    - name: argo-cd-argocd-server
+      port: 80
+      scheme: h2c
+    middlewares:
+    - name: https-redirect
+      namespace: argocd
+  tls:
+    secretName: argocd-cert # same content as in traefik-cert
+    domains:
+      - main: argocd-dashboard-atlas-test-1.hostk8s4.com
+
+
