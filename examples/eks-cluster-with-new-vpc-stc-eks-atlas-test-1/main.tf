@@ -32,7 +32,7 @@ locals {
   name = var.cluster_name
   # var.cluster_name is for Terratest
   cluster_name = coalesce(var.cluster_name, local.name)
-  region       = "us-east-2"
+  region       = "${var.env_data["region"]}"
 
   #vpc_cidr = "172.17.0.0/16"
   vpc_cidr = "${var.env_data["vpc_cidr"]}"
@@ -41,8 +41,8 @@ locals {
   tags = {
     Blueprint  = local.name
     GithubRepo = "github.com/aws-ia/terraform-aws-eks-blueprints"
-    environment = "test"
-    project = "atlas"
+    environment = "${var.env_data["environment"]}"
+    project = "${var.env_data["project"]}"
   }
 }
 
@@ -54,7 +54,7 @@ module "eks_blueprints" {
   source = "../.."
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.23"
+  cluster_version = "${var.env_data["cluster_version"]}"
 
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
@@ -98,14 +98,14 @@ module "eks_blueprints" {
   self_managed_node_groups = {
     self_t3 = {
       node_group_name = "self-managed-ondemand-t3"
-      instance_type  = "t3.xlarge"
+      instance_type  = "${var.env_data["instance_type"]}"
       launch_template_os   = "amazonlinux2eks"       # amazonlinux2eks
-      min_size        = 2
+      min_size        = 3
       desired_capacity    = 3
       max_size        = 6
       subnet_ids      = module.vpc.private_subnets
       update_config = [{
-        max_unavailable_percentage = 30
+        max_unavailable_percentage = 10
       }]
       #enable_monitoring = false
       #public_ip         = false 
@@ -157,7 +157,7 @@ module "eks_blueprints_kubernetes_addons" {
   # TODO - requires dependency on `cert-manager` for namespace
   # enable_cert_manager_csi_driver = true
 
-  enable_traefik = false
+  enable_traefik = true
   enable_argocd = true
 
   tags = local.tags

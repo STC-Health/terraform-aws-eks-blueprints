@@ -21,7 +21,8 @@ module "helm_addon" {
       name        = local.name
       chart       = local.name
       repository  = "https://helm.traefik.io/traefik"
-      version     = "18.1.0"
+      version     = "20.6.0"
+      values      = [file("${path.module}/values.yaml")]
       namespace   = try(kubernetes_namespace_v1.this[0].metadata[0].name, local.namespace)
       description = "The Traefik Helm Chart is focused on Traefik deployment configuration"
     },

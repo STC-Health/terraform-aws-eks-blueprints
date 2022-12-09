@@ -9,12 +9,12 @@ spec:
   routes:
   - match: Host(`traefik-dashboard-atlas-test-1.hostk8s4.com`)
     kind: Rule
-    services:
-    - name: api@internal
-      kind: TraefikService
-     middlewares:
-     - name: https-redirect
-       namespace: traefik
-     - name: traefik-dashboard-redirect
-       namespace: traefik
+  services:
+  - name: api@internal
+    kind: TraefikService
+   middlewares:
+   - name: https-redirect
+     namespace: traefik
+     #- name: traefik-dashboard-redirect
+     #  namespace: traefik
 

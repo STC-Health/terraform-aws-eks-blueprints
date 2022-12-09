@@ -12,7 +12,8 @@ variable "env_data" {
         vpc_cidr = "172.17.0.0/16"
         environment = "test"
         project = "atlas"
-        cluster_version = "1.23"
+        cluster_version = "1.24"
+        instance_type = "t3a.large"
     }
 }
 
