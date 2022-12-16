@@ -1,0 +1,13 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogMonitor
+metadata:
+  name: pods-failed
+  namespace: datadog
+spec:
+  query: "change(avg(last_5m),last_5m):sum:kubernetes_state.pod.status_phase{phase:failed} by {kube_cluster_name,kube_namespace} > 1"
+  type: "query alert"
+  name: "Kubernetes Failed Pods in Namespaces in ({{kube_cluster_name.name}} cluster)"
+  message: "More than 1 pods are failing in ({{kube_cluster_name.name}} cluster). @devops@stchome.com"
+  tags:
+    - "integration:kubernetes"
+    - "project:atlas"

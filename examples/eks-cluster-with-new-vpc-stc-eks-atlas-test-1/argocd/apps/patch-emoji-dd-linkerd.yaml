@@ -1,0 +1,6 @@
+spec:
+  template:
+    metadata:
+      annotations:
+        linkerd.io/inject: enabled
+        ad.datadoghq.com/emoji-svc.logs: '[{"source":"emoji-svc"}]'

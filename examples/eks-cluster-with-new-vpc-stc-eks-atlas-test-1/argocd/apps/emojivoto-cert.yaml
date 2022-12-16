@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: emojivoto-cert
+  namespace: emojivoto
+spec:
+  secretName: emojivoto-cert  # Need to install Cert-manager CRD and Traefix will use the lets encrypt issued Cert for the domain nam
+  dnsNames:
+    - emojivoto-atlas-test-1.hostk8s4.com # Domain is hosted in Route53
+  issuerRef:
+    name: traefik-letsencrypt-1
+    kind: ClusterIssuer

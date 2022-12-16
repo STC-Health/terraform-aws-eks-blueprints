@@ -1,0 +1,18 @@
+kind: IngressRoute
+apiVersion: traefik.containo.us/v1alpha1
+metadata:
+  name: emojivoto-redirect
+  namespace: emojivoto
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`emojivoto-atlas-test-1.hostk8s4.com`)
+    kind: Rule
+    services:
+    - name: web-svc
+      port: 80
+    middlewares:
+    - name: https-redirect
+      namespace: emojivoto
+

@@ -1,0 +1,69 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: guestbook:apps/Deployment:default/guestbook-ui
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"guestbook:apps/Deployment:default/guestbook-ui"},"labels":{"argocd.argoproj.io/instance":"guestbook"},"name":"guestbook-ui","namespace":"default"},"spec":{"replicas":1,"revisionHistoryLimit":3,"selector":{"matchLabels":{"app":"guestbook-ui"}},"template":{"metadata":{"labels":{"app":"guestbook-ui"}},"spec":{"containers":[{"image":"gcr.io/heptio-images/ks-guestbook-demo:0.2","name":"guestbook-ui","ports":[{"containerPort":80}]}]}}}}
+    generation: 1
+    labels:
+      argocd.argoproj.io/instance: guestbook
+    name: guestbook-ui
+    namespace: default
+    resourceVersion: "4177114"
+    uid: 9587bf0b-0993-4ddc-9fe6-e0410eabf6e3
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app: guestbook-ui
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          linkerd.io/inject: enabled
+          ad.datadoghq.com/guestbook-ui.logs: '[{"source":"guestbook-ui"}]'
+        labels:
+          app: guestbook-ui
+      spec:
+        containers:
+        - image: gcr.io/heptio-images/ks-guestbook-demo:0.2
+          imagePullPolicy: IfNotPresent
+          name: guestbook-ui
+          ports:
+          - containerPort: 80
+            protocol: TCP
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - message: ReplicaSet "guestbook-ui-76f97c94c" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata: {}
+---

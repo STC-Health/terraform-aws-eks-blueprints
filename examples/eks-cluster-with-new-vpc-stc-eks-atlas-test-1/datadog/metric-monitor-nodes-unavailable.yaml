@@ -1,0 +1,13 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogMonitor
+metadata:
+  name: nodes-unavailable
+  namespace: datadog
+spec:
+  query: "max(last_15m):sum:kubernetes_state.node.status{status:schedulable} by {kube_cluster_name} * 100 / sum:kubernetes_state.node.status{*} by {kube_cluster_name} < 80"
+  type: "query alert"
+  name: "Unschedulable Kubernetes Nodes in ({{kube_cluster_name.name}} cluster)"
+  message: "More than 20% of nodes are unschedulable on ({{kube_cluster_name.name}} cluster). @devops@stchome.com"
+  tags:
+    - "integration:kubernetes"
+    - "project: atlas"

@@ -1,0 +1,33 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogAgent
+metadata:
+  name: datadog
+  namespace: datadog
+spec:
+  clusterName: stc-eks-atlas-test-1
+  credentials:
+    apiKey: #Enter Value
+    appKey: #Enter Value 
+  agent:
+    apm:
+      enabled: false
+    process:
+      enabled: true
+      processCollectionEnabled: false
+    log:
+      enabled: true
+      containerCollectUsingFiles: true
+      logsConfigContainerCollectAll: false
+    systemProbe:
+      bpfDebugEnabled: false
+    security:
+      compliance:
+        enabled: false
+      runtime:
+        enabled: false
+  clusterAgent:
+    config:
+      externalMetrics:
+        enabled: true
+      admissionController:
+        enabled: true
