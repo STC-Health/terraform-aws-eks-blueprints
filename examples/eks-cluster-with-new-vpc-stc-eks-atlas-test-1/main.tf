@@ -157,7 +157,7 @@ module "eks_blueprints_kubernetes_addons" {
   # TODO - requires dependency on `cert-manager` for namespace
   # enable_cert_manager_csi_driver = true
 
-  enable_traefik = true
+  enable_traefik = false
   enable_argocd = true
 
   tags = local.tags

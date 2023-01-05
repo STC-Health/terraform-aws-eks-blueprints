@@ -4,9 +4,9 @@ metadata:
   name: pods-restarting
   namespace: datadog
 spec:
-  query: "change(sum(last_5m),last_5m):exclude_null(avg:kubernetes.containers.restarts{*} by {pod_name}) > 1"
+  query: "change(sum(last_5m),last_5m):exclude_null(avg:kubernetes.containers.restarts{*} by {pod_name}) in {kube_cluster_name} > 1"
   type: "query alert"
-  name: "Kubernetes Pods Restarting in ({{kube_cluster_name.name}} cluster)"
+  name: "Kubernetes Pods Restarting in stc-eks-atlas-test-1 cluster"
   message: "Pods are restarting multiple times in the last five minutes. @devops@stchome.com"
   tags:
     - "integration:kubernetes"
